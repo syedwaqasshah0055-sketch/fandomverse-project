@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FandomVerse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0a14; --panel:#14121f; --panel2:#1b1830;
+  --violet:#7c5cff; --pink:#ff3d81; --gold:#ffc857;
+  --text:#f1eef7; --muted:#9b93b8; --line:#2a2640;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,.brand{font-family:'Space Grotesk',sans-serif;}
+::-webkit-scrollbar{height:8px;width:8px;} ::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;}
+
+/* NAV */
+header{position:sticky;top:0;z-index:30;background:rgba(11,10,20,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:calc(12px + env(safe-area-inset-top,0px)) 20px 12px;}
+.navwrap{max-width:1600px;margin:0 auto;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.brand{font-size:1.3rem;font-weight:700;background:linear-gradient(90deg,var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;cursor:pointer;white-space:nowrap;}
+.nav-toggle{display:none;align-items:center;justify-content:center;width:42px;height:42px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:1.2rem;cursor:pointer;}
+nav{display:flex;gap:4px;flex-wrap:wrap;flex:1;}
+nav button{background:none;border:none;color:var(--muted);font-size:.9rem;font-family:'Inter';padding:7px 12px;border-radius:20px;cursor:pointer;transition:.15s;}
+nav button:hover,nav button.active{color:var(--text);background:var(--panel2);}
+.searchbox{position:relative;display:flex;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:6px 14px;gap:6px;min-width:160px;}
+.searchbox input{background:none;border:none;color:var(--text);outline:none;font-size:.85rem;width:100%;}
+.searchresults{position:absolute;top:calc(100% + 8px);right:0;width:320px;max-width:calc(100vw - 40px);background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.35);padding:6px;display:none;z-index:50;}
+.searchresults.open{display:block;}
+.searchresult{display:block;width:100%;text-align:left;background:none;border:0;border-radius:8px;color:var(--text);padding:9px 10px;cursor:pointer;}
+.searchresult:hover{background:var(--panel2);}
+.searchresult strong,.searchresult small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.searchresult small{color:var(--muted);font-size:.7rem;margin-top:3px;}
+.search-empty{color:var(--muted);font-size:.78rem;padding:9px 10px;}
+.cartbtn{position:relative;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:20px;padding:7px 14px;cursor:pointer;font-size:.85rem;}
+.cartbtn .dot{position:absolute;top:-4px;right:-4px;background:var(--pink);border-radius:50%;width:16px;height:16px;font-size:.65rem;display:flex;align-items:center;justify-content:center;}
+
+main{max-width:1600px;margin:0 auto;padding:28px 20px 80px;}
+.page{display:none;} .page.active{display:block;animation:fade .35s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* HERO */
+.hero{border-radius:20px;padding:48px 36px;background:radial-gradient(circle at 20% 20%,rgba(124,92,255,.35),transparent 60%),radial-gradient(circle at 80% 80%,rgba(255,61,129,.3),transparent 55%),var(--panel);border:1px solid var(--line);margin-bottom:34px;}
+.hero-art{position:absolute;right:0;top:0;width:42%;height:100%;object-fit:cover;opacity:.78;mix-blend-mode:screen;mask-image:linear-gradient(90deg,transparent,#000 35%);cursor:pointer;}
+.hero span.tag{color:var(--gold);font-size:.8rem;letter-spacing:.03em;}
+.hero h1{font-size:clamp(1.8rem,4vw,2.8rem);margin:8px 0 10px;line-height:1.1;}
+.hero p{color:var(--muted);max-width:520px;margin:0 0 18px;}
+.hero button{background:linear-gradient(90deg,var(--violet),var(--pink));color:#fff;border:none;padding:11px 22px;border-radius:24px;font-weight:600;cursor:pointer;}
+
+/* CATEGORY GRID */
+.catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-bottom:36px;}
+.catcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center;cursor:pointer;transition:.15s;overflow:hidden;}
+.catcard:hover{border-color:var(--violet);transform:translateY(-3px);}
+.catcard img{display:block;width:100%;height:68px;object-fit:cover;border-radius:9px;margin-bottom:10px;}
+.catcard .ic{font-size:1.6rem;}
+.catcard div.n{margin-top:6px;font-size:.85rem;font-weight:600;}
+
+section.block{margin-bottom:40px;}
+.blockhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+.blockhead h2{font-size:1.3rem;margin:0;}
+.blockhead span{color:var(--muted);font-size:.8rem;}
+
+.cardrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:.15s;cursor:pointer;}
+.card:hover{border-color:var(--pink);}
+.card .thumb{height:120px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,var(--panel2),var(--bg));overflow:hidden;}
+.card .thumb img{width:100%;height:100%;object-fit:cover;opacity:.88;}
+.card .body{padding:12px 14px;}
+.card h3{font-size:.95rem;margin:0 0 4px;}
+.card p{font-size:.78rem;color:var(--muted);margin:0 0 8px;line-height:1.4;}
+.card .meta{display:flex;justify-content:space-between;font-size:.72rem;color:var(--gold);}
+
+/* HUB CONTROLS */
+.hubtop{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:22px;}
+.hubtop select,.hubtop input{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 12px;font-size:.82rem;}
+.pill{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:6px 14px;font-size:.78rem;cursor:pointer;color:var(--muted);}
+.pill.active{color:#fff;background:var(--violet);border-color:var(--violet);}
+
+/* CHARACTER */
+.charrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;}
+.charcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center;}
+.charcard .av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--violet));display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:1.3rem;}
+.charcard h4{margin:0 0 3px;font-size:.85rem;} .charcard small{color:var(--muted);font-size:.7rem;}
+.hubbanner{height:150px;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:20px;background:var(--panel2);}
+.hubbanner img{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;}
+
+/* MERCH */
+.merchcard .price{color:var(--gold);font-weight:600;}
+.merchcard button{margin-top:6px;width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:7px;border-radius:8px;cursor:pointer;font-size:.78rem;}
+.merchcard button:hover{border-color:var(--pink);}
+.merch-showcase{width:100%;height:190px;object-fit:cover;border-radius:14px;margin:0 0 24px;border:1px solid var(--line);}
+
+footer{border-top:1px solid var(--line);padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));text-align:center;color:var(--muted);font-size:.8rem;}
+
+/* CHATBOT */
+.chatbtn{position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--pink));border:none;color:#fff;font-size:1.4rem;cursor:pointer;box-shadow:0 6px 20px rgba(124,92,255,.4);z-index:40;}
+.chatpanel{position:fixed;bottom:90px;right:20px;width:300px;max-width:88vw;height:400px;background:var(--panel);border:1px solid var(--line);border-radius:16px;display:none;flex-direction:column;overflow:hidden;z-index:40;box-shadow:0 10px 40px rgba(0,0,0,.5);}
+.chatpanel.open{display:flex;}
+.chathead{padding:12px 14px;background:var(--panel2);font-size:.85rem;font-weight:600;}
+.chatbody{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;}
+.msg{padding:8px 11px;border-radius:12px;font-size:.8rem;max-width:80%;line-height:1.35;}
+.msg.bot{background:var(--panel2);align-self:flex-start;}
+.msg.user{background:var(--violet);align-self:flex-end;}
+.chatinput{display:flex;border-top:1px solid var(--line);}
+.chatinput input{flex:1;background:none;border:none;color:var(--text);padding:10px 12px;font-size:.8rem;outline:none;}
+.chatinput button{background:none;border:none;color:var(--pink);padding:0 14px;cursor:pointer;font-weight:600;}
+.quick{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px;}
+.quick span{font-size:.7rem;background:var(--panel2);padding:4px 8px;border-radius:10px;cursor:pointer;color:var(--muted);}
+
+@media(max-width:900px){
+  header{padding-left:16px;padding-right:16px;}
+  .navwrap{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;}
+  nav{grid-column:1/-1;grid-row:2;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;padding-bottom:2px;}
+  nav::-webkit-scrollbar{display:none;}
+  nav button{flex:0 0 auto;min-height:40px;}
+  .searchbox{min-width:0;width:clamp(150px,30vw,280px);}
+  main{padding-left:18px;padding-right:18px;}
+}
+@media(max-width:640px){
+  header{padding:10px 12px;}
+  .navwrap{grid-template-columns:minmax(0,1fr) auto auto;gap:8px;}
+  .brand{font-size:1.15rem;}
+  .nav-toggle{display:flex;grid-column:2;grid-row:1;}
+  nav{grid-column:1/-1;grid-row:3;display:none;flex-wrap:wrap;overflow:visible;padding:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;}
+  .navwrap.menu-open nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
+  nav button{width:100%;min-height:44px;padding:8px 10px;text-align:left;font-size:.82rem;border-radius:8px;}
+  .cartbtn{grid-column:3;grid-row:1;}
+  .searchbox{grid-column:1/-1;grid-row:2;width:100%;min-height:42px;}
+  main{padding:20px 14px 56px;}
+  .hero{padding:30px 20px;margin-bottom:24px;}
+  .hero-art{width:100%;opacity:.2;mask-image:linear-gradient(90deg,rgba(0,0,0,.15),#000);}
+  .hero .tag,.hero h1,.hero p,.hero button{position:relative;z-index:1;}
+  .hero .tag{display:block;line-height:1.5;}
+  .hero button{min-height:44px;}
+  .catgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+  .catcard{padding:8px;}
+  .catcard img{height:76px;}
+  .cardrow{grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:12px;}
+  .charrow{grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:10px;}
+  .blockhead{gap:10px;align-items:flex-start;}
+  .blockhead h2{font-size:1.15rem;}
+  .blockhead span{text-align:right;}
+  .hubtop{gap:8px;}
+  .hubtop .pill,.hubtop select{min-height:40px;}
+  .hubbanner{height:clamp(110px,34vw,180px);}
+  .merch-showcase{height:clamp(130px,45vw,190px);}
+  .chatbtn{right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:52px;height:52px;}
+  .chatpanel{right:12px;bottom:calc(76px + env(safe-area-inset-bottom,0px));width:min(360px,calc(100vw - 24px));height:min(400px,calc(100dvh - 100px));}
+}
+@media(max-width:380px){
+  .cartbtn{padding:7px 10px;font-size:.78rem;}
+  .hero{padding:24px 16px;}
+  .hero h1{font-size:1.75rem;}
+  .catcard img{height:64px;}
+  .card .body{padding:11px 12px;}
+  .card .meta{gap:8px;flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="navwrap">
+    <div class="brand" onclick="go('home')">FandomVerse</div>
+    <button class="nav-toggle" id="menuToggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mainnav" onclick="toggleMobileNav()"><span aria-hidden="true">☰</span></button>
+    <nav id="mainnav">
+      <button onclick="go('home')" data-p="home">Home</button>
+      <button onclick="go('anime')" data-p="anime">Anime</button>
+      <button onclick="go('gaming')" data-p="gaming">Gaming</button>
+      <button onclick="go('movies')" data-p="movies">Movies</button>
+      <button onclick="go('tv')" data-p="tv">TV Shows</button>
+      <button onclick="go('kpop')" data-p="kpop">K-Pop</button>
+      <button onclick="go('comics')" data-p="comics">Comics</button>
+      <button onclick="go('manga')" data-p="manga">Manga</button>
+      <button onclick="go('merch')" data-p="merch">Merch</button>
+      <button onclick="go('about')" data-p="about">About</button>
+    </nav>
+    <div class="searchbox"><span>🔎</span><input id="globalSearch" placeholder="Search anime, games…" oninput="globalSearch(this.value)" onkeydown="if(event.key==='Escape')closeSearch()"><div id="searchResults" class="searchresults"></div></div>
+    <button class="cartbtn" onclick="go('merch')">🛍 Cart<span class="dot" id="cartDot">0</span></button>
+  </div>
+</header>
+
+<main>
+
+  <!-- HOME -->
+  <section id="home" class="page active">
+    <div class="hero" style="position:relative;overflow:hidden;">
+      <img class="hero-art" src="assets/anime-1.png" alt="Anime fandom artwork" onclick="go('anime')">
+      <span class="tag">FEATURED · DEMON SLAYER: SWORDSMITH VILLAGE ARC</span>
+      <h1>One portal for every fandom you love.</h1>
+      <p>Anime, gaming, K-pop, comics and more — articles, trailers, character lore and merch, all in one place instead of ten open tabs.</p>
+      <button onclick="go('anime')">Explore Anime →</button>
+    </div>
+
+    <div class="catgrid">
+      <div class="catcard" onclick="go('anime')"><img src="assets/anime-2.png" alt="Anime room"><div class="ic" data-icon="anime"></div><div class="n">Anime</div></div>
+      <div class="catcard" onclick="go('gaming')"><img src="assets/gaming-2.png" alt="Gaming room"><div class="ic" data-icon="gaming"></div><div class="n">Gaming</div></div>
+      <div class="catcard" onclick="go('movies')"><img src="assets/movies-1.png" alt="Movie room"><div class="ic" data-icon="movies"></div><div class="n">Movies</div></div>
+      <div class="catcard" onclick="go('tv')"><img src="assets/tv-1.png" alt="TV room"><div class="ic" data-icon="tv"></div><div class="n">TV Shows</div></div>
+      <div class="catcard" onclick="go('kpop')"><img src="assets/kpop-1.png" alt="K-pop room"><div class="ic" data-icon="kpop"></div><div class="n">K-Pop</div></div>
+      <div class="catcard" onclick="go('comics')"><img src="assets/comics-1.png" alt="Comics room"><div class="ic" data-icon="comics"></div><div class="n">Comics</div></div>
+      <div class="catcard" onclick="go('manga')"><img src="assets/manga-1.png" alt="Manga room"><div class="ic" data-icon="manga"></div><div class="n">Manga</div></div>
+    </div>
+
+    <section class="block">
+      <div class="blockhead"><h2>Trending now</h2><span>Across all fandoms</span></div>
+      <div class="cardrow" id="trendingRow"></div>
+    </section>
+
+    <section class="block">
+      <div class="blockhead"><h2>Upcoming events</h2><span>Conventions & meetups</span></div>
+      <div class="cardrow" id="eventsHome"></div>
+    </section>
+  </section>
+
+  <!-- ANIME HUB -->
+  <section id="anime" class="page">
+    <div class="hubbanner" onclick="go('anime')"><img src="assets/anime-2.png" alt="Anime fandom artwork"></div>
+    <h2 style="margin-bottom:4px">Anime Hub</h2>
+    <p style="color:var(--muted);margin-top:0">Articles, character lore, trailers and events from the anime world.</p>
+    <div class="hubtop">
+      <span class="pill active" data-f="all" onclick="setFilter('anime',this,'all')">All</span>
+      <span class="pill" data-f="article" onclick="setFilter('anime',this,'article')">Articles</span>
+      <span class="pill" data-f="video" onclick="setFilter('anime',this,'video')">Trailers</span>
+      <span class="pill" data-f="character" onclick="setFilter('anime',this,'character')">Characters</span>
+      <span class="pill" data-f="event" onclick="setFilter('anime',this,'event')">Events</span>
+      <select onchange="setSort('anime',this.value)">
+        <option value="featured">Sort: Featured</option>
+        <option value="newest">Sort: Newest</option>
+        <option value="az">Sort: A–Z</option>
+      </select>
+    </div>
+    <div class="cardrow" id="animeGrid"></div>
+    <div class="blockhead" style="margin-top:36px"><h2>Character profiles</h2></div>
+    <div class="charrow" id="animeChars"></div>
+  </section>
+
+  <!-- GAMING HUB -->
+  <section id="gaming" class="page">
+    <div class="hubbanner" onclick="go('gaming')"><img src="assets/gaming-1.png" alt="Gaming fandom artwork"></div>
+    <h2 style="margin-bottom:4px">Gaming Hub</h2>
+    <p style="color:var(--muted);margin-top:0">RPGs, live-service titles, trailers and esports events.</p>
+    <div class="hubtop">
+      <span class="pill active" data-f="all" onclick="setFilter('gaming',this,'all')">All</span>
+      <span class="pill" data-f="article" onclick="setFilter('gaming',this,'article')">Articles</span>
+      <span class="pill" data-f="video" onclick="setFilter('gaming',this,'video')">Trailers</span>
+      <span class="pill" data-f="character" onclick="setFilter('gaming',this,'character')">Characters</span>
+      <span class="pill" data-f="event" onclick="setFilter('gaming',this,'event')">Events</span>
+      <select onchange="setSort('gaming',this.value)">
+        <option value="featured">Sort: Featured</option>
+        <option value="newest">Sort: Newest</option>
+        <option value="az">Sort: A–Z</option>
+      </select>
+    </div>
+    <div class="cardrow" id="gamingGrid"></div>
+    <div class="blockhead" style="margin-top:36px"><h2>Character profiles</h2></div>
+    <div class="charrow" id="gamingChars"></div>
+  </section>
+
+  <!-- MERCH -->
+  <section id="merch" class="page">
+    <h2 style="margin-bottom:4px">Merchandise Showcase</h2>
+    <p style="color:var(--muted);margin-top:0">Add items to your cart and see the running total — checkout isn't part of this demo.</p>
+    <img class="merch-showcase" src="assets/merch-collection.png" alt="Fandom merchandise collection" onclick="toast('Choose a product below to add it to your cart')">
+    <div class="cardrow" id="merchGrid"></div>
+    <div class="hero" style="margin-top:24px;padding:22px 28px;">
+      <h3 style="margin:0 0 6px">Cart total: <span id="cartTotal" style="color:var(--gold)">$0.00</span></h3>
+      <p id="cartItems" style="color:var(--muted);margin:0;font-size:.85rem">No items yet.</p>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="page">
+    <h2>About FandomVerse</h2>
+    <p style="color:var(--muted);max-width:560px;line-height:1.6">FandomVerse is a demo build of the SRS-specified portal — a single hub for anime, gaming and beyond, so fans stop switching between ten tabs. This build implements the Anime and Gaming hubs end-to-end (search, filter, sort, characters, merch cart, chatbot) as a working template the remaining five categories (Movies, TV Shows, K-Pop, Comics, Manga) can be extended into using the same JSON-driven pattern.</p>
+  </section>
+
+</main>
+
+<footer>© FandomVerse — demo build, all content placeholder/original · no data leaves your browser</footer>
+
+<button class="chatbtn" onclick="toggleChat()">💬</button>
+<div class="chatpanel" id="chatPanel">
+  <div class="chathead">FandomVerse Assistant</div>
+  <div class="chatbody" id="chatBody">
+    <div class="msg bot">Hey! Ask me about anime, gaming, events or merch — or tap a suggestion below.</div>
+  </div>
+  <div class="quick">
+    <span onclick="askBot('recommend anime')">Recommend anime</span>
+    <span onclick="askBot('events')">Upcoming events</span>
+    <span onclick="askBot('merch')">Merch help</span>
+  </div>
+  <div class="chatinput">
+    <input id="chatIn" placeholder="Type a question…" onkeydown="if(event.key==='Enter')sendChat()">
+    <button onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+/* ---------- DATA (pre-populated JSON-style content, per SRS) ---------- */
+const DATA = {
+  anime: [
+    {id:1,type:'article',title:'The Rise of New-Gen Anime',desc:'A global phenomenon reshaping how fans discover shows.',tag:'Anime',date:'2026-05-22',featured:true,icon:'📰'},
+    {id:2,type:'video',title:'Swordsmith Village Arc — Trailer',desc:'Tanjiro and friends face new challenges.',tag:'Trailer',date:'2026-06-01',featured:true,icon:'🎬'},
+    {id:3,type:'event',title:'Anime Expo 2026',desc:'Los Angeles, USA — July 4–7.',tag:'Convention',date:'2026-07-04',featured:false,icon:'📅'},
+    {id:4,type:'article',title:'Top 10 Isekai You Missed',desc:'Underrated gems from the last two seasons.',tag:'Anime',date:'2026-04-10',featured:false,icon:'📰'},
+    {id:5,type:'event',title:'Tokyo Cosplay Meetup',desc:'Shibuya, Japan — August 12.',tag:'Meetup',date:'2026-08-12',featured:false,icon:'📅'},
+    {id:6,type:'video',title:'Voice Actor Interview: Kimetsu Cast',desc:'Behind the mic with the main cast.',tag:'Interview',date:'2026-03-15',featured:false,icon:'🎙️'},
+  ],
+  gaming: [
+    {id:7,type:'article',title:'Top 10 RPGs You Shouldn\'t Miss in 2026',desc:'From indie darlings to AAA epics.',tag:'Gaming',date:'2026-05-16',featured:true,icon:'📰'},
+    {id:8,type:'video',title:'Genshin Impact 4.7 — Trailer',desc:'New region, new characters revealed.',tag:'Trailer',date:'2026-05-30',featured:true,icon:'🎬'},
+    {id:9,type:'event',title:'Japan Expo 2026',desc:'Paris, France — July 5–7.',tag:'Convention',date:'2026-07-05',featured:false,icon:'📅'},
+    {id:10,type:'article',title:'Patch Notes Explained: Season 4',desc:'Balance changes fans are talking about.',tag:'Gaming',date:'2026-04-02',featured:false,icon:'📰'},
+    {id:11,type:'event',title:'Regional Esports Finals',desc:'Karachi, PK — September 20.',tag:'Esports',date:'2026-09-20',featured:false,icon:'📅'},
+    {id:12,type:'video',title:'Speedrun Podcast Ep.12',desc:'World record strategies discussed.',tag:'Podcast',date:'2026-02-11',featured:false,icon:'🎙️'},
+  ],
+  movies:[
+    {id:13,type:'article',title:'Superhero Sagas: 2026 Preview',desc:'Every major franchise film releasing this year.',tag:'Movies',date:'2026-05-20',featured:true,icon:'📰'},
+    {id:14,type:'video',title:'Summer Blockbuster — Trailer',desc:'First look at the season\'s biggest release.',tag:'Trailer',date:'2026-06-05',featured:true,icon:'🎬'},
+    {id:15,type:'event',title:'Comic-Con International',desc:'San Diego, USA — July 24–28.',tag:'Convention',date:'2026-07-24',featured:false,icon:'📅'},
+    {id:16,type:'article',title:'Behind the VFX: A Deep Dive',desc:'How studios built this year\'s biggest scenes.',tag:'Movies',date:'2026-04-18',featured:false,icon:'📰'},
+    {id:17,type:'event',title:'Outdoor Movie Night',desc:'Karachi, PK — August 30.',tag:'Screening',date:'2026-08-30',featured:false,icon:'📅'},
+    {id:18,type:'video',title:'Director\'s Cut Commentary',desc:'The cast and crew break down key scenes.',tag:'Interview',date:'2026-03-02',featured:false,icon:'🎙️'},
+  ],
+  tv:[
+    {id:19,type:'article',title:'Stranger Things S4: What We Know',desc:'Everything revealed so far about the new season.',tag:'TV Shows',date:'2026-05-12',featured:true,icon:'📰'},
+    {id:20,type:'video',title:'Season Finale — Trailer',desc:'The wait is almost over.',tag:'Trailer',date:'2026-06-10',featured:true,icon:'🎬'},
+    {id:21,type:'event',title:'TV Fan Fest',desc:'London, UK — September 5.',tag:'Convention',date:'2026-09-05',featured:false,icon:'📅'},
+    {id:22,type:'article',title:'Binge Guide: Underrated Series',desc:'Five shows that deserve more attention.',tag:'TV Shows',date:'2026-04-25',featured:false,icon:'📰'},
+    {id:23,type:'event',title:'Watch Party Meetup',desc:'Lahore, PK — August 8.',tag:'Meetup',date:'2026-08-08',featured:false,icon:'📅'},
+    {id:24,type:'video',title:'Cast Roundtable',desc:'The ensemble discusses the finale.',tag:'Interview',date:'2026-02-20',featured:false,icon:'🎙️'},
+  ],
+  kpop:[
+    {id:25,type:'article',title:'K-pop Groups Dominating the Global Charts',desc:'Who\'s topping the charts this quarter.',tag:'K-Pop',date:'2026-05-18',featured:true,icon:'📰'},
+    {id:26,type:'video',title:'Comeback MV — Official',desc:'The long-awaited music video has arrived.',tag:'MV',date:'2026-06-03',featured:true,icon:'🎬'},
+    {id:27,type:'event',title:'World Tour Stop',desc:'Los Angeles, USA — August 4.',tag:'Concert',date:'2026-08-04',featured:false,icon:'📅'},
+    {id:28,type:'article',title:'Fandom Spotlight: Fan Projects',desc:'The creative projects fans are building.',tag:'K-Pop',date:'2026-04-08',featured:false,icon:'📰'},
+    {id:29,type:'event',title:'Fan Meetup & Lightstick Swap',desc:'Karachi, PK — July 19.',tag:'Meetup',date:'2026-07-19',featured:false,icon:'📅'},
+    {id:30,type:'video',title:'Dance Practice — Behind the Scenes',desc:'Choreography breakdown with the group.',tag:'Fan content',date:'2026-03-11',featured:false,icon:'🎙️'},
+  ],
+  comics:[
+    {id:31,type:'article',title:'New Universe Reboot Explained',desc:'What changes for longtime readers.',tag:'Comics',date:'2026-05-09',featured:true,icon:'📰'},
+    {id:32,type:'video',title:'Motion Comic Teaser',desc:'First animated panels revealed.',tag:'Trailer',date:'2026-06-02',featured:true,icon:'🎬'},
+    {id:33,type:'event',title:'Indie Comics Festival',desc:'Toronto, Canada — September 12.',tag:'Convention',date:'2026-09-12',featured:false,icon:'📅'},
+    {id:34,type:'article',title:'Artist Spotlight: Rising Illustrators',desc:'The new talent shaping the medium.',tag:'Comics',date:'2026-04-14',featured:false,icon:'📰'},
+    {id:35,type:'event',title:'Local Comic Swap Meet',desc:'Karachi, PK — August 22.',tag:'Meetup',date:'2026-08-22',featured:false,icon:'📅'},
+    {id:36,type:'video',title:'Writer\'s Room Podcast',desc:'How the latest arc came together.',tag:'Podcast',date:'2026-02-28',featured:false,icon:'🎙️'},
+  ],
+  manga:[
+    {id:37,type:'article',title:'New Chapter Breakdown',desc:'Analyzing this week\'s biggest twist.',tag:'Manga',date:'2026-05-24',featured:true,icon:'📰'},
+    {id:38,type:'video',title:'Anniversary Trailer',desc:'Celebrating a decade of the series.',tag:'Trailer',date:'2026-06-07',featured:true,icon:'🎬'},
+    {id:39,type:'event',title:'Manga Artist Signing',desc:'Tokyo, Japan — July 30.',tag:'Signing',date:'2026-07-30',featured:false,icon:'📅'},
+    {id:40,type:'article',title:'Translation Notes: Volume 12',desc:'What gets lost (and found) in translation.',tag:'Manga',date:'2026-04-05',featured:false,icon:'📰'},
+    {id:41,type:'event',title:'Manga Cafe Reading Night',desc:'Karachi, PK — September 2.',tag:'Meetup',date:'2026-09-02',featured:false,icon:'📅'},
+    {id:42,type:'video',title:'Editor Interview',desc:'Inside the making of the series.',tag:'Interview',date:'2026-03-19',featured:false,icon:'🎙️'},
+  ]
+};
+const CHARS = {
+  anime:[{n:'Tanjiro Kamado',s:'Demon Slayer',t:'Determined, kind'},{n:'Luffy',s:'One Piece',t:'Fearless, loyal'},
+         {n:'Gojo Satoru',s:'Jujutsu Kaisen',t:'Confident, powerful'},{n:'Eren Yeager',s:'Attack on Titan',t:'Driven, complex'},
+         {n:'Nezuko',s:'Demon Slayer',t:'Protective, resilient'}],
+  gaming:[{n:'Aloy',s:'Horizon',t:'Curious, resourceful'},{n:'Kiryu',s:'Yakuza',t:'Honorable, tough'},
+          {n:'Lara Croft',s:'Tomb Raider',t:'Adventurous, sharp'},{n:'Geralt',s:'The Witcher',t:'Stoic, principled'},
+          {n:'Ellie',s:'The Last of Us',t:'Resilient, witty'}],
+  movies:[{n:'Kaito Rennick',s:'Skyline Protocol',t:'Resourceful, wry'},{n:'Sera Nightingale',s:'The Last Vault',t:'Calculating, brave'},
+          {n:'Marcus Dune',s:'Red Horizon',t:'Stoic, loyal'},{n:'Priya Anand',s:'Skyline Protocol',t:'Sharp, idealistic'},
+          {n:'The Warden',s:'The Last Vault',t:'Mysterious, cunning'}],
+  tv:[{n:'Wren Castellan',s:'Hollow Creek',t:'Curious, guarded'},{n:'Dr. Mae Ibori',s:'Nightshift',t:'Analytical, warm'},
+      {n:'Leo Marsh',s:'Hollow Creek',t:'Reckless, loyal'},{n:'Ava Solum',s:'Nightshift',t:'Determined, sharp'},
+      {n:'Commander Reyes',s:'Nightshift',t:'Disciplined, fair'}],
+  kpop:[{n:'Jiho',s:'NEBULA',t:'Charismatic, driven'},{n:'Yuna',s:'VELVET EDGE',t:'Bold, expressive'},
+        {n:'Daehyun',s:'NEBULA',t:'Grounded, kind'},{n:'Sori',s:'VELVET EDGE',t:'Playful, sharp'},
+        {n:'Minji',s:'NEBULA',t:'Quiet, intense'}],
+  comics:[{n:'Iron Vulture',s:'Sentinel Saga',t:'Vigilant, brooding'},{n:'Quickstrike',s:'Rebound Origins',t:'Fast, sarcastic'},
+          {n:'Nightglass',s:'Sentinel Saga',t:'Enigmatic, cool'},{n:'Ember Voss',s:'Rebound Origins',t:'Fiery, protective'},
+          {n:'The Cartographer',s:'Sentinel Saga',t:'Strategic, calm'}],
+  manga:[{n:'Haru Tanaka',s:'Silent Blade',t:'Determined, humble'},{n:'Rin Aoki',s:'Moonlit Garden',t:'Gentle, resilient'},
+         {n:'Kenta Mori',s:'Silent Blade',t:'Hot-headed, loyal'},{n:'Sayo Kurosawa',s:'Moonlit Garden',t:'Wise, distant'},
+         {n:'Old Master Ito',s:'Silent Blade',t:'Patient, cryptic'}]
+};
+const MERCH = [
+  {n:'Wanted Poster Mug',p:12.99,icon:'☕',image:'assets/merch-mug.png'},
+  {n:'Demon Slayer Hoodie',p:39.99,icon:'🧥',image:'assets/merch-collection.png'},
+  {n:'Genshin Pin Set',p:9.99,icon:'📌',image:'assets/merch-collection.png'},
+  {n:'Attack Titan Tee',p:19.99,icon:'👕',image:'assets/merch-collection.png'},
+  {n:'Con-Exclusive Figure',p:54.99,icon:'🎎',image:'assets/merch-collection.png'},
+  {n:'K-Pop Lightstick',p:44.99,icon:'✨',image:'assets/merch-collection.png'}
+];
+const state={anime:{filter:'all',sort:'featured'},gaming:{filter:'all',sort:'featured'},cart:[]};
+['movies','tv','kpop','comics','manga'].forEach(c=>state[c]={filter:'all',sort:'featured'});
+const CATEGORY_IMAGES={
+  anime:'assets/anime-2.png',gaming:'assets/gaming-2.png',movies:'assets/movies-1.png',
+  tv:'assets/tv-1.png',kpop:'assets/kpop-1.png',comics:'assets/comics-1.png',manga:'assets/manga-1.png'
+};
+
+/* ---------- NAV ---------- */
+function go(p){
+  document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
+  document.getElementById(p).classList.add('active');
+  document.querySelectorAll('#mainnav button').forEach(b=>b.classList.toggle('active',b.dataset.p===p));
+  document.querySelector('.navwrap').classList.remove('menu-open');
+  const menuToggle=document.getElementById('menuToggle');
+  menuToggle.setAttribute('aria-expanded','false');
+  menuToggle.setAttribute('aria-label','Open navigation menu');
+  menuToggle.querySelector('span').textContent='☰';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggleMobileNav(){
+  const navWrap=document.querySelector('.navwrap');
+  const menuToggle=document.getElementById('menuToggle');
+  const isOpen=navWrap.classList.toggle('menu-open');
+  menuToggle.setAttribute('aria-expanded',String(isOpen));
+  menuToggle.setAttribute('aria-label',isOpen?'Close navigation menu':'Open navigation menu');
+  menuToggle.querySelector('span').textContent=isOpen?'×':'☰';
+}
+function toast(msg){ const b=document.getElementById('chatBody'); /* reuse simple alert-free toast via chat */ 
+  const t=document.createElement('div'); t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1b1830;border:1px solid #2a2640;padding:10px 18px;border-radius:20px;font-size:.8rem;z-index:60;';
+  document.body.appendChild(t); setTimeout(()=>t.remove(),1800);
+}
+
+/* ---------- RENDER CARDS ---------- */
+function renderGrid(cat){
+  const {filter,sort}=state[cat];
+  let items=DATA[cat].filter(i=>filter==='all'||i.type===filter);
+  if(sort==='az') items=[...items].sort((a,b)=>a.title.localeCompare(b.title));
+  else if(sort==='newest') items=[...items].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  else items=[...items].sort((a,b)=>(b.featured?1:0)-(a.featured?1:0));
+  const grid=document.getElementById(cat+'Grid');
+  grid.innerHTML=items.map(i=>`
+    <div class="card" onclick="toast('${i.title.replace(/'/g,"")}')">
+      <div class="thumb"><img src="${CATEGORY_IMAGES[cat]}" alt="${i.tag} artwork" onclick="go('${cat}')"></div>
+      <div class="body"><h3>${i.title}</h3><p>${i.desc}</p>
+      <div class="meta"><span>${i.tag}</span><span>${i.date}</span></div></div>
+    </div>`).join('') || '<p style="color:var(--muted)">No content matches this filter.</p>';
+}
+function setFilter(cat,el,f){
+  state[cat].filter=f;
+  el.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid(cat);
+}
+function setSort(cat,v){ state[cat].sort=v; renderGrid(cat); }
+
+function renderChars(cat){
+  document.getElementById(cat+'Chars').innerHTML = CHARS[cat].map(c=>`
+    <div class="charcard"><div class="av">${c.n[0]}</div><h4>${c.n}</h4><small>${c.s}</small><br><small>${c.t}</small></div>
+  `).join('');
+}
+
+function catOf(item){ return Object.keys(DATA).find(k=>DATA[k].includes(item)); }
+function renderHome(){
+  const all=Object.values(DATA).flat();
+  const trending=all.filter(i=>i.featured);
+  document.getElementById('trendingRow').innerHTML=trending.map(i=>`
+    <div class="card" onclick="go('${catOf(i)}')">
+      <div class="thumb"><img src="${CATEGORY_IMAGES[catOf(i)]}" alt="${i.tag} artwork" onclick="go('${catOf(i)}')"></div><div class="body"><h3>${i.title}</h3><p>${i.desc}</p>
+      <div class="meta"><span>${i.tag}</span><span>${i.date}</span></div></div></div>`).join('');
+  const events=all.filter(i=>i.type==='event').slice(0,6);
+  document.getElementById('eventsHome').innerHTML=events.map(i=>`
+    <div class="card" onclick="go('${catOf(i)}')"><div class="thumb"><img src="${CATEGORY_IMAGES[catOf(i)]}" alt="${i.tag} artwork" onclick="go('${catOf(i)}')"></div><div class="body"><h3>${i.title}</h3><p>${i.desc}</p></div></div>`).join('');
+}
+
+function renderMerch(){
+  document.getElementById('merchGrid').innerHTML = MERCH.map((m,idx)=>`
+    <div class="card merchcard"><div class="thumb"><img src="${m.image}" alt="${m.n}" onclick="toast('${m.n}')"></div><div class="body">
+      <h3>${m.n}</h3><p class="price">$${m.p.toFixed(2)}</p>
+      <button onclick="addCart(${idx})">Add to cart</button></div></div>`).join('');
+  updateCartUI();
+}
+function addCart(idx){ state.cart.push(MERCH[idx]); updateCartUI(); toast(MERCH[idx].n+' added to cart'); }
+function updateCartUI(){
+  document.getElementById('cartDot').textContent=state.cart.length;
+  const total=state.cart.reduce((s,i)=>s+i.p,0);
+  document.getElementById('cartTotal').textContent='$'+total.toFixed(2);
+  document.getElementById('cartItems').textContent = state.cart.length ? state.cart.map(i=>i.n).join(', ') : 'No items yet.';
+}
+
+/* ---------- GLOBAL SEARCH ---------- */
+let searchMatches=[];
+function globalSearch(q){
+  const panel=document.getElementById('searchResults');
+  const query=q.trim().toLowerCase();
+  if(query.length<2){ closeSearch(); return; }
+  searchMatches=[];
+  Object.entries(DATA).forEach(([cat,items])=>items.forEach(item=>{
+    const haystack=`${item.title} ${item.desc} ${item.tag}`.toLowerCase();
+    if(haystack.includes(query)) searchMatches.push({type:'content',cat,item});
+  }));
+  MERCH.forEach(item=>{
+    if(`${item.n} merch`.toLowerCase().includes(query)) searchMatches.push({type:'merch',cat:'merch',item});
+  });
+  panel.innerHTML=searchMatches.length
+    ? searchMatches.slice(0,8).map((result,index)=>`<button class="searchresult" onclick="openSearchResult(${index})"><strong>${result.item.title||result.item.n}</strong><small>${result.cat==='merch'?'Merchandise':result.item.tag+' · '+result.cat}</small></button>`).join('')
+    : '<div class="search-empty">No matching fandom content found.</div>';
+  panel.classList.add('open');
+}
+function openSearchResult(index){
+  const result=searchMatches[index];
+  if(!result) return;
+  closeSearch();
+  document.getElementById('globalSearch').value='';
+  go(result.cat);
+  if(result.type==='content') toast(result.item.title);
+}
+function closeSearch(){
+  const panel=document.getElementById('searchResults');
+  if(panel) panel.classList.remove('open');
+}
+
+/* ---------- CHATBOT (rule-based, pre-scripted per SRS constraint) ---------- */
+function toggleChat(){ document.getElementById('chatPanel').classList.toggle('open'); }
+function sendChat(){
+  const inp=document.getElementById('chatIn'); const v=inp.value.trim();
+  if(!v) return; addMsg(v,'user'); inp.value=''; setTimeout(()=>respond(v),300);
+}
+function askBot(q){ addMsg(q,'user'); setTimeout(()=>respond(q),300); }
+function addMsg(t,who){ const b=document.getElementById('chatBody'); const d=document.createElement('div'); d.className='msg '+who; d.textContent=t; b.appendChild(d); b.scrollTop=b.scrollHeight; }
+function respond(q){
+  q=q.toLowerCase(); let r="I can help with anime, gaming, events or merch — try asking about one of those!";
+  if(q.includes('anime')) r="The Anime hub has trailers, articles, characters and events — want me to take you there?";
+  else if(q.includes('game') || q.includes('gaming')) r="Check the Gaming hub for the latest RPG picks and esports events!";
+  else if(q.includes('event')) r="Upcoming: Anime Expo 2026 (LA, Jul 4–7) and Japan Expo 2026 (Paris, Jul 5–7).";
+  else if(q.includes('merch')) r="Visit the Merch page to browse items and add them to your cart — no checkout in this demo though.";
+  else if(q.includes('recommend')) r="Based on trending picks, I'd start with 'Swordsmith Village Arc' or 'Genshin Impact 4.7'.";
+  addMsg(r,'bot');
+}
+
+/* ---------- BESPOKE SVG ICONS (custom-drawn, no external assets) ---------- */
+const ICONS = {
+  anime:`<svg viewBox="0 0 40 40" width="26" height="26"><path d="M12 30 Q20 8 28 30" stroke="#ff3d81" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="20" cy="14" r="3" fill="#ffc857"/></svg>`,
+  gaming:`<svg viewBox="0 0 40 40" width="26" height="26"><rect x="7" y="15" width="26" height="14" rx="7" fill="none" stroke="#7c5cff" stroke-width="2.5"/><circle cx="15" cy="22" r="1.8" fill="#7c5cff"/><circle cx="25" cy="19" r="1.8" fill="#ff3d81"/><circle cx="29" cy="23" r="1.8" fill="#ffc857"/></svg>`,
+  movies:`<svg viewBox="0 0 40 40" width="26" height="26"><rect x="8" y="10" width="24" height="20" rx="2" fill="none" stroke="#ff3d81" stroke-width="2.5"/><path d="M8 16h24M14 10v6M26 10v6" stroke="#ff3d81" stroke-width="2"/></svg>`,
+  tv:`<svg viewBox="0 0 40 40" width="26" height="26"><rect x="6" y="12" width="28" height="18" rx="2" fill="none" stroke="#7c5cff" stroke-width="2.5"/><path d="M14 34h12" stroke="#7c5cff" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  kpop:`<svg viewBox="0 0 40 40" width="26" height="26"><circle cx="20" cy="14" r="5" fill="none" stroke="#ffc857" stroke-width="2.5"/><path d="M20 19v14" stroke="#ffc857" stroke-width="2.5"/><path d="M13 33h14" stroke="#ffc857" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  comics:`<svg viewBox="0 0 40 40" width="26" height="26"><path d="M20 6 L24 16 L34 16 L26 22 L29 33 L20 26 L11 33 L14 22 L6 16 L16 16 Z" fill="none" stroke="#ff3d81" stroke-width="2"/></svg>`,
+  manga:`<svg viewBox="0 0 40 40" width="26" height="26"><rect x="9" y="7" width="22" height="26" rx="1.5" fill="none" stroke="#7c5cff" stroke-width="2.5"/><path d="M13 14h14M13 20h14M13 26h9" stroke="#7c5cff" stroke-width="1.8" stroke-linecap="round"/></svg>`
+};
+document.querySelectorAll('[data-icon]').forEach(el=>{ el.innerHTML = ICONS[el.dataset.icon] || ''; });
+
+/* ---------- DYNAMIC HUB PAGES (same template as Anime/Gaming, built once) ---------- */
+const HUB_META = {
+  movies:{title:'Movies Hub',desc:'Trailers, franchise news and premiere events from the big screen.'},
+  tv:{title:'TV Shows Hub',desc:'Season updates, cast interviews and fan meetups.'},
+  kpop:{title:'K-Pop Hub',desc:'Comebacks, tour dates and fandom spotlights.'},
+  comics:{title:'Comics Hub',desc:'New arcs, artist spotlights and con events.'},
+  manga:{title:'Manga Hub',desc:'Chapter breakdowns, signings and reading meetups.'}
+};
+function buildHub(cat){
+  const m=HUB_META[cat];
+  const sec=document.createElement('section'); sec.id=cat; sec.className='page';
+  sec.innerHTML=`
+    <div class="hubbanner" onclick="go('${cat}')"><img src="${CATEGORY_IMAGES[cat]}" alt="${m.title} artwork"></div>
+    <h2 style="margin-bottom:4px">${m.title}</h2>
+    <p style="color:var(--muted);margin-top:0">${m.desc}</p>
+    <div class="hubtop">
+      <span class="pill active" data-f="all" onclick="setFilter('${cat}',this,'all')">All</span>
+      <span class="pill" data-f="article" onclick="setFilter('${cat}',this,'article')">Articles</span>
+      <span class="pill" data-f="video" onclick="setFilter('${cat}',this,'video')">Trailers</span>
+      <span class="pill" data-f="event" onclick="setFilter('${cat}',this,'event')">Events</span>
+      <select onchange="setSort('${cat}',this.value)">
+        <option value="featured">Sort: Featured</option>
+        <option value="newest">Sort: Newest</option>
+        <option value="az">Sort: A–Z</option>
+      </select>
+    </div>
+    <div class="cardrow" id="${cat}Grid"></div>
+    <div class="blockhead" style="margin-top:36px"><h2>Character profiles</h2></div>
+    <div class="charrow" id="${cat}Chars"></div>`;
+  document.querySelector('#merch').insertAdjacentElement('beforebegin', sec);
+}
+
+/* init */
+['movies','tv','kpop','comics','manga'].forEach(buildHub);
+['anime','gaming','movies','tv','kpop','comics','manga'].forEach(c=>{ renderGrid(c); renderChars(c); });
+renderHome(); renderMerch();
+</script>
+</body>
+</html>
